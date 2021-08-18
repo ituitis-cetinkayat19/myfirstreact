@@ -96,6 +96,15 @@ class MyComponent extends React.Component {
       <button onClick={() => this.changeAttribute("rings")}>Ring</button>
       <button onClick={() => this.showAll()}>All</button>
       {this.state.all ? <this.printAll /> : <this.printTable />}
+      <h1>INSERT NEW PLANET</h1>
+      <form action="http://localhost:2000/example" method="POST">
+        <input type="text" name = "name" placeholder="Enter planet name"/><br/>
+        <input type="text" name = "color" placeholder="Enter planet color"/><br/>
+        <input type="text" name = "num_of_moons" placeholder="Enter num. of moons"/><br/>
+        <input type="text" name = "mass" placeholder="Enter mass/Earth's mass"/><br/>
+        <input type="text" name = "rings" placeholder="Enter ring"/><br/>
+        <input type="submit" value = "Submit"/>
+      </form>
       </div>
     );
   }
