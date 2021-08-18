@@ -9,7 +9,8 @@ class MyComponent extends React.Component {
     this.state = {
       planets: [],
       attribute: "name",
-      all: false
+      all: false,
+      form: {name:'test',}
     };
   }  
   componentDidMount() {
@@ -86,6 +87,45 @@ class MyComponent extends React.Component {
   );
   }
 
+  // https://gomakethings.com/how-to-serialize-form-data-with-vanilla-js/
+  serialize(data) {
+    let obj = {};
+    for (let [key, value] of data) {
+      if (obj[key] !== undefined) {
+        if (!Array.isArray(obj[key])) {
+          obj[key] = [obj[key]];
+        }
+        obj[key].push(value);
+      } else {
+        obj[key] = value;
+      }
+    }
+    return obj;
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
+    let form = document.querySelector('#form');
+    let data = new FormData(form);
+    let formObj = this.serialize(data);
+    fetch("http://localhost:2000/add", {
+      method: "POST",
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(formObj)
+    })
+    .then(res => res.json())
+    .then((result) => {
+        console.log("Response:", result);
+      }
+    )
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+  }
+  
   render() {
     return (
       <div id="body">
@@ -97,7 +137,7 @@ class MyComponent extends React.Component {
       <button onClick={() => this.showAll()}>All</button>
       {this.state.all ? <this.printAll /> : <this.printTable />}
       <h1>INSERT NEW PLANET</h1>
-      <form action="http://localhost:2000/example" method="POST">
+      <form id="form" onSubmit={this.handleSubmit.bind(this)}>
         <input type="text" name = "name" placeholder="Enter planet name"/><br/>
         <input type="text" name = "color" placeholder="Enter planet color"/><br/>
         <input type="text" name = "num_of_moons" placeholder="Enter num. of moons"/><br/>
