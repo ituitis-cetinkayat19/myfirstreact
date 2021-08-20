@@ -2,15 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import "./index.css";
 
-
 class MyComponent extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       planets: [],
       attribute: "name",
-      all: false,
-      form: {name:'test',}
+      all: false
     };
   }  
   componentDidMount() {
@@ -54,6 +52,36 @@ class MyComponent extends React.Component {
 );
   }
 
+  deleteData = (number) =>{
+    let txt = {"number":number};
+    fetch("http://localhost:2000/delete", {
+      method: "DELETE",
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(txt)
+    })
+    .then(res => res.json())
+    .then((result) => {
+        console.log("Response:", result);
+        fetch("http://localhost:2000/all")
+        .then(res => res.json())
+        .then(
+          (result) => {
+            this.setState({planets: result});
+          }
+        )
+        .catch((error) => {
+          console.error('Error:', error);
+        });        
+      }
+    )
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+  }
+
   showAll = () => {
     this.setState({
       all: true
@@ -70,14 +98,15 @@ class MyComponent extends React.Component {
           <th>{properties === "id" ? properties.toUpperCase() : properties}</th>
         ))
       }
+      <th>DELETE</th>
   </tr>
-
 
   {this.state.planets.map(planet => (
     <tr>
     {Object.keys(planet).map(properties => (
       <td>{planet[properties]}</td>
   ))}
+      <td><button id="delete" onClick={() => this.deleteData(planet.id)}>DELETE</button></td>
    </tr>
   ))}
 
@@ -87,7 +116,6 @@ class MyComponent extends React.Component {
   );
   }
 
-  // https://gomakethings.com/how-to-serialize-form-data-with-vanilla-js/
   serialize(data) {
     let obj = {};
     for (let [key, value] of data) {
@@ -119,6 +147,16 @@ class MyComponent extends React.Component {
     .then(res => res.json())
     .then((result) => {
         console.log("Response:", result);
+        fetch("http://localhost:2000/all")
+        .then(res => res.json())
+        .then(
+          (result) => {
+            this.setState({planets: result});
+          }
+        )
+        .catch((error) => {
+          console.error('Error:', error);
+        });        
       }
     )
     .catch((error) => {
@@ -142,7 +180,8 @@ class MyComponent extends React.Component {
         <input type="text" name = "color" placeholder="Enter planet color"/><br/>
         <input type="text" name = "num_of_moons" placeholder="Enter num. of moons"/><br/>
         <input type="text" name = "mass" placeholder="Enter mass/Earth's mass"/><br/>
-        <input type="text" name = "rings" placeholder="Enter ring"/><br/>
+        <label>Ring:</label><br/>
+        <input type="checkbox" name = "rings"/><br/>
         <input type="submit" value = "Submit"/>
       </form>
       </div>
