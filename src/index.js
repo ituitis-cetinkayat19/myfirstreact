@@ -8,7 +8,8 @@ class MyComponent extends React.Component {
     this.state = {
       planets: [],
       attribute: "name",
-      all: false
+      all: false,
+      updateid: 0
     };
   }  
   componentDidMount() {
@@ -88,6 +89,23 @@ class MyComponent extends React.Component {
     });
   }
 
+  fillForm = (planet) => {
+    var form = document.querySelector("#form2");
+    for (let x = 0; x < 5; x++)
+    {
+      if(form[x].type !== "checkbox")
+        form[x].value = planet[Object.keys(planet)[x+1]];
+      else if(planet[Object.keys(planet)[x+1]] === 1)
+        form[x].checked = true;
+      else
+        form[x].checked = false;
+      form[x].readOnly = false;
+    }
+    this.setState({
+      updateid: planet.id
+    });
+  }
+
   printAll = () => {
     return(
       <div>
@@ -99,6 +117,7 @@ class MyComponent extends React.Component {
         ))
       }
       <th>DELETE</th>
+      <th>UPDATE</th>
   </tr>
 
   {this.state.planets.map(planet => (
@@ -107,6 +126,7 @@ class MyComponent extends React.Component {
       <td>{planet[properties]}</td>
   ))}
       <td><button id="delete" onClick={() => this.deleteData(planet.id)}>DELETE</button></td>
+      <td><button id="update" onClick={() => this.fillForm(planet)}>UPDATE</button></td>
    </tr>
   ))}
 
@@ -129,6 +149,40 @@ class MyComponent extends React.Component {
       }
     }
     return obj;
+  }
+
+  updateTable(event){
+    event.preventDefault();
+    let form = document.querySelector('#form2');
+    let data = new FormData(form);
+    let formObj = this.serialize(data);
+    formObj.id = this.state.updateid;
+    fetch("http://localhost:2000/update", {
+      method: "PUT",
+      headers: {
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(formObj)
+    })
+    .then(res => res.json())
+    .then((result) => {
+        console.log("Response:", result);
+        fetch("http://localhost:2000/all")
+        .then(res => res.json())
+        .then(
+          (result) => {
+            this.setState({planets: result});
+          }
+        )
+        .catch((error) => {
+          console.error('Error:', error);
+        });        
+      }
+    )
+    .catch((error) => {
+      console.error('Error:', error);
+    });
   }
 
   handleSubmit(event) {
@@ -174,8 +228,9 @@ class MyComponent extends React.Component {
       <button onClick={() => this.changeAttribute("rings")}>Ring</button>
       <button onClick={() => this.showAll()}>All</button>
       {this.state.all ? <this.printAll /> : <this.printTable />}
-      <h1>INSERT NEW PLANET</h1>
+      <div id="forms">
       <form id="form" onSubmit={this.handleSubmit.bind(this)}>
+        <h1>INSERT PLANET</h1>
         <input type="text" name = "name" placeholder="Enter planet name"/><br/>
         <input type="text" name = "color" placeholder="Enter planet color"/><br/>
         <input type="text" name = "num_of_moons" placeholder="Enter num. of moons"/><br/>
@@ -184,6 +239,17 @@ class MyComponent extends React.Component {
         <input type="checkbox" name = "rings"/><br/>
         <input type="submit" value = "Submit"/>
       </form>
+      <form id="form2" onSubmit={this.updateTable.bind(this)}>
+        <h1>UPDATE PLANET</h1>
+        <input type="text" name = "name" placeholder="Enter planet name" readOnly/><br/>
+        <input type="text" name = "color" placeholder="Enter planet color" readOnly/><br/>
+        <input type="text" name = "num_of_moons" placeholder="Enter num. of moons" readOnly/><br/>
+        <input type="text" name = "mass" placeholder="Enter mass/Earth's mass" readOnly/><br/>
+        <label>Ring:</label><br/>
+        <input type="checkbox" name = "rings" readOnly/><br/>
+        <input type="submit" value = "Submit"/>
+      </form>
+      </div>
       </div>
     );
   }
