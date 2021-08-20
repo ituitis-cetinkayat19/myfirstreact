@@ -91,15 +91,18 @@ class MyComponent extends React.Component {
 
   fillForm = (planet) => {
     var form = document.querySelector("#form2");
-    for (let x = 0; x < 5; x++)
+    for (let x in planet)
     {
+      if(x !== "id")
+      {
       if(form[x].type !== "checkbox")
-        form[x].value = planet[Object.keys(planet)[x+1]];
-      else if(planet[Object.keys(planet)[x+1]] === 1)
+        form[x].value = planet[x];
+      else if(planet[x] === 1)
         form[x].checked = true;
       else
         form[x].checked = false;
       form[x].readOnly = false;
+      }
     }
     this.setState({
       updateid: planet.id
