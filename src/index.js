@@ -9,11 +9,12 @@ class MyComponent extends React.Component {
       planets: [],
       attribute: "name",
       all: false,
-      updateid: 0
+      updateid: 0,
+      datahost: process.env.REACT_APP_DATAHOST || "http://localhost:2000"
     };
   }  
   componentDidMount() {
-    fetch("http://localhost:2000/all")
+    fetch(this.state.datahost+"/all")
       .then(res => res.json())
       .then(
         (result) => {
@@ -55,7 +56,7 @@ class MyComponent extends React.Component {
 
   deleteData = (number) =>{
     let txt = {"number":number};
-    fetch("http://localhost:2000/delete", {
+    fetch(this.state.datahost+"/delete", {
       method: "DELETE",
       headers: {
         'Accept': 'application/json, text/plain, */*',
@@ -160,7 +161,7 @@ class MyComponent extends React.Component {
     let data = new FormData(form);
     let formObj = this.serialize(data);
     formObj.id = this.state.updateid;
-    fetch("http://localhost:2000/update", {
+    fetch(this.state.datahost+"/update", {
       method: "PUT",
       headers: {
         'Accept': 'application/json, text/plain, */*',
@@ -171,7 +172,7 @@ class MyComponent extends React.Component {
     .then(res => res.json())
     .then((result) => {
         console.log("Response:", result);
-        fetch("http://localhost:2000/all")
+        fetch(this.state.datahost+"/all")
         .then(res => res.json())
         .then(
           (result) => {
@@ -193,7 +194,7 @@ class MyComponent extends React.Component {
     let form = document.querySelector('#form');
     let data = new FormData(form);
     let formObj = this.serialize(data);
-    fetch("http://localhost:2000/add", {
+    fetch(this.state.datahost+"/add", {
       method: "POST",
       headers: {
         'Accept': 'application/json, text/plain, */*',
@@ -204,7 +205,7 @@ class MyComponent extends React.Component {
     .then(res => res.json())
     .then((result) => {
         console.log("Response:", result);
-        fetch("http://localhost:2000/all")
+        fetch(this.state.datahost+"/all")
         .then(res => res.json())
         .then(
           (result) => {
