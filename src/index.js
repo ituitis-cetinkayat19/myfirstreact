@@ -10,7 +10,7 @@ class MyComponent extends React.Component {
       attribute: "name",
       all: false,
       updateid: 0,
-      datahost: process.env.REACT_APP_DATAHOST || "http://localhost:2000"
+      datahost: process.env.REACT_APP_DATAHOST || "http://localhost:2000" 
     };
   }  
   componentDidMount() {
@@ -67,7 +67,7 @@ class MyComponent extends React.Component {
     .then(res => res.json())
     .then((result) => {
         console.log("Response:", result);
-        fetch("http://localhost:2000/all")
+        fetch(this.state.datahost+"/all")
         .then(res => res.json())
         .then(
           (result) => {
